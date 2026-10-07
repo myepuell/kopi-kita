@@ -1,0 +1,22 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: kopikita-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-kopikita}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-kopikita_secret}
+      POSTGRES_DB: ${DB_NAME:-kopikita}
+    ports:
+      - "5433:5432"
+    volumes:
+      - kopikita_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kopikita -d kopikita"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  kopikita_pgdata:
+    name: kopikita_pgdata
