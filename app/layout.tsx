@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import "./globals.css";
@@ -8,7 +8,11 @@ export const metadata: Metadata = {
   description: "Kedai kopi artisan dengan suasana hangat di Jakarta Selatan. Nikmati seduhan kopi pilihan, pastry segar, dan reservasi meja secara online.",
   keywords: ["kopi kita", "coffee shop", "jakarta selatan", "reservasi meja", "artisan coffee"],
   authors: [{ name: "Kopi Kita Team" }],
-  viewport: "width=device-width, initial-scale=1",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({

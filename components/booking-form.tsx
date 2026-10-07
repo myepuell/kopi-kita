@@ -123,7 +123,7 @@ export default function BookingForm() {
     <div className="mx-auto max-w-2xl">
       {/* Confirmation Card when submitted */}
       {submittedData ? (
-        <div className="overflow-hidden rounded-3xl border border-espresso/15 bg-white p-8 shadow-xl">
+        <div id="confirmation-card" className="overflow-hidden rounded-3xl border border-espresso/15 bg-white p-8 shadow-xl">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700 mb-6">
             <CheckCircle2 className="h-8 w-8" />
           </div>
