@@ -1,70 +1,92 @@
 # Kopi Kita
 
-Kopi Kita is a warm, modern coffee-shop web application featuring a database-backed catalog, table booking flow, and protected administrative CMS. The public interface allows guests to explore products and make table reservations, while the back-office CMS empowers staff to manage products, categories, stock availability, and reservations.
+Kopi Kita adalah aplikasi web kedai kopi modern berbasis Next.js App Router, Tailwind CSS, dan TypeScript. Aplikasi ini dirancang dengan estetika warm artisan coffee yang menyajikan katalog produk interaktif, filter kategori, penanda stok ("Sold Out"), serta sistem reservasi meja lengkap dengan validasi komprehensif dan kartu konfirmasi instan.
 
-## Key Features
+## Fitur Utama
 
-- **Guest Portal:**
-  - Modern, responsive landing page, interactive menu, and booking pages.
-  - Category filtering, stock status indicators, loading states, and error recovery.
-  - Client-side and server-side table reservation validation.
+- **Halaman Beranda (`/`):**
+  - Hero section menarik dengan call-to-action ke Menu dan Reservasi.
+  - Statistik pengunjung, jam operasional, dan nilai keunggulan (*Artisan Roast*, *Single Origin*, *Warm Atmosphere*).
+  - Menu rekomendasi terfavorit dengan harga dan rating.
 
-- **Admin CMS:**
-  - Protected back-office for managing coffee and food products.
-  - Real-time stock status toggles and manual booking status updates.
-  - Database-backed HttpOnly session authentication surviving application restarts.
+- **Katalog Menu Interaktif (`/menu`):**
+  - Sumber data terpusat di `lib/menu-data.ts`.
+  - Filter kategori dinamis (*All*, *Coffee*, *Non-Coffee*, *Pastry*, *Food*).
+  - Penanda badge **Sold Out** otomatis untuk produk dengan status `available: false`.
+  - Modal detail produk interaktif dengan estimasi waktu penyajian, catatan rasa, dan deskripsi lengkap.
 
-- **Robust Architecture:**
-  - Monorepo architecture with Next.js frontend proxying `/api/*` to a standalone Express API.
-  - Structured PostgreSQL database with numbered SQL migrations executed on startup.
-  - Containerized with Docker Compose for seamless local development and production deployment.
+- **Reservasi Meja (`/booking`):**
+  - Form reservasi meja dengan validasi ketat di sisi klien:
+    - Menolak tanggal yang sudah lewat (hanya mengizinkan hari ini atau ke depan).
+    - Menolak karakter huruf atau simbol pada nomor WhatsApp (hanya angka numerik, minimal 10 digit).
+    - Pilihan slot waktu operasional (08:00 - 20:00) dan jumlah tamu (1 - 8 orang).
+    - Pemilihan area duduk (*Indoor AC*, *Outdoor Garden*, *Smoking Area*, *Bar Counter*).
+  - Kartu konfirmasi instan berbentuk tiket booking setelah submit data valid, dilengkapi tombol cetak dan reservasi baru.
+
+- **Desain Responsif & Mikro-Interaksi:**
+  - Navigasi navbar responsif dengan mobile drawer menu.
+  - Palet warna konsisten (`espresso`, `mocha`, `caramel`, `cream`).
+  - Halaman kustom 404 Not Found.
 
 ## Tech Stack
 
-- **Frontend:** Next.js (App Router), React, Tailwind CSS, Motion
-- **Backend:** Node.js, Express, TypeScript, Zod
-- **Database:** PostgreSQL with automated migrations
-- **Infrastructure:** Docker, Docker Compose, Nginx
+- **Framework:** Next.js 15 (App Router)
+- **UI & Styling:** React 19, Tailwind CSS, Lucide Icons
+- **Language:** TypeScript
+- **State & Data:** Centralized data store (`lib/menu-data.ts`)
 
-## Repository Structure
+## Struktur Proyek
 
 ```text
 kopi-kita/
-├── apps/
-│   ├── api/          # Express API, PostgreSQL access, and migrations
-│   └── web/          # Next.js web application and UI components
-├── packages/
-│   └── shared/       # Shared Zod validation schemas and TypeScript types
-├── docker-compose.yml # Multi-container Docker configuration
-└── README.md
+├── app/
+│   ├── booking/
+│   │   └── page.tsx       # Halaman reservasi meja
+│   ├── menu/
+│   │   └── page.tsx       # Halaman katalog menu & filter kategori
+│   ├── globals.css        # Tailwind directives & tema warna
+│   ├── layout.tsx         # Root layout dengan Navbar & Footer
+│   ├── not-found.tsx      # Custom 404 page
+│   └── page.tsx           # Halaman beranda / landing page
+├── components/
+│   ├── booking-form.tsx   # Form reservasi & kartu konfirmasi
+│   ├── footer.tsx         # Footer informasi & tautan
+│   ├── hero.tsx           # Hero section beranda
+│   ├── highlights.tsx     # Fitur keunggulan & menu terpopuler
+│   └── navbar.tsx         # Navbar sticky & menu mobile
+├── lib/
+│   └── menu-data.ts       # Data sumber menu, kategori, status stok
+├── public/                # Aset statis & favicon
+├── package.json
+├── tailwind.config.ts
+└── tsconfig.json
 ```
 
-## Quick Start (Docker)
+## Menjalankan di Lokal
 
-1. Clone this repository and ensure Docker Desktop is running.
-2. Prepare environment variables:
+1. Pastikan Node.js v20+ atau v22+ telah terpasang.
+2. Clone repository dan masuk ke folder proyek:
    ```bash
-   cp .env.example .env
+   git clone https://github.com/myepuell/kopi-kita.git
+   cd kopi-kita
    ```
-3. Build and launch services:
+3. Install dependensi:
    ```bash
-   docker compose up --build
+   npm install
    ```
-4. Access the web app at `http://localhost:3030` and the API at `http://localhost:4000`.
+4. Jalankan development server:
+   ```bash
+   npm run dev
+   ```
+5. Buka [http://localhost:3000](http://localhost:3000) di browser Anda.
 
-## Local Development
-
-Start PostgreSQL in Docker, then run the Node applications:
+## Build Produksi
 
 ```bash
-docker compose up -d db
-npm install
-npm run dev
+npm run build
+npm run start
 ```
 
-- Web interface: `http://localhost:3000`
-- Express API: `http://localhost:4000`
+## Lisensi
 
-## License
-
-This project is open-source and created for educational and practical development purposes.
+Open source untuk keperluan belajar dan portofolio Universa Academy.

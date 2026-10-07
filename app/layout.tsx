@@ -5,7 +5,10 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Kopi Kita — Ruang Nyaman untuk Secangkir Cerita",
-  description: "Kedai kopi artisan dengan suasana hangat di Jakarta Selatan. Nikmati seduhan kopi pilihan dan pastry segar.",
+  description: "Kedai kopi artisan dengan suasana hangat di Jakarta Selatan. Nikmati seduhan kopi pilihan, pastry segar, dan reservasi meja secara online.",
+  keywords: ["kopi kita", "coffee shop", "jakarta selatan", "reservasi meja", "artisan coffee"],
+  authors: [{ name: "Kopi Kita Team" }],
+  viewport: "width=device-width, initial-scale=1",
 };
 
 export default function RootLayout({
