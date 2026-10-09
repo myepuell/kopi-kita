@@ -42,12 +42,21 @@ Kopi Kita adalah aplikasi web kedai kopi modern berbasis Next.js App Router, Tai
     - `/admin/products`: Tabel manajemen produk realtime dengan filter kategori, toggle ketersediaan stok, modal tambah/edit produk, dan hapus produk.
     - `/admin/bookings`: Tabel manajemen reservasi meja dengan KPI summary card, filter status, dan dropdown ubah status realtime yang langsung tersimpan ke database.
 
+- **Integrasi Penuh Frontend & Backend (Module 4):**
+  - **Single Dev Server (Next.js App Router):** Seluruh REST API Express telah dimigrasikan ke Next.js Route Handlers (`app/api/...`), berjalan mulus dalam satu server terpadu di port 3000. Express port 4000 dipensiunkan sehingga tidak lagi memerlukan dual server orchestration maupun konfigurasi CORS lintas port.
+  - **Direct PostgreSQL Integration:** Halaman `/menu` kini terhubung langsung ke PostgreSQL melalui route handler `GET /api/products` dengan loading skeleton state dan error state. Data mock tidak lagi digunakan.
+  - **Two-way Sync CMS & Menu:** Perubahan nama, harga, atau ketersediaan produk di CMS `/admin/products` langsung tersinkronisasi dan tampil seketika di katalog pelanggan `/menu`.
+  - **End-to-End Booking Journey:** Alur reservasi dari form `/booking` otomatis tersimpan ke PostgreSQL, menghasilkan tiket konfirmasi, muncul di antrean `/admin/bookings`, dan statusnya dapat langsung diperbarui ke "Dikonfirmasi".
+  - **Server-Side Validation Defense (Sneaky Curl Protected):** Route handler `POST /api/bookings` menerapkan validasi ketat di sisi server (misal: menolak `party_size` di luar rentang 1–8 seperti `party_size: 999` dengan HTTP 400 Bad Request).
+  - **Relative API Routing:** Semua pemanggilan API menggunakan path relatif (`/api/...`) pada origin yang sama.
+  - **Security Fence Tetap Aktif:** Endpoint admin `GET /api/bookings` dan mutasi status diproteksi otentikasi JWT dengan status 401 Unauthorized jika token tidak disertakan.
+
 ## Tech Stack
 
-- **Frontend:** Next.js 15 (App Router), React 19, Tailwind CSS, Lucide Icons, TypeScript
-- **Backend API:** Node.js, Express, TypeScript, tsx, CORS, JSON Web Token (JWT), bcryptjs
-- **Database:** PostgreSQL 16 via Docker, node-postgres (`pg`) connection pooling
-- **Infrastructure:** Docker Compose dengan named volume `kopikita_pgdata`
+- **Fullstack Web:** Next.js 15 (App Router), React 19, Tailwind CSS, Lucide Icons, TypeScript
+- **Unified Route Handlers:** Next.js API Routes (`app/api/...`), JSON Web Token (JWT), bcryptjs
+- **Database:** PostgreSQL 16 via Docker, node-postgres (`pg`) connection pooling (`lib/db.ts`)
+- **Infrastructure:** Docker Compose dengan named volume `kopikita_pgdata` di port host 5433
 
 ## Struktur Proyek
 
@@ -62,10 +71,22 @@ kopi-kita/
 │   │   ├── products/
 │   │   │   └── page.tsx       # CMS: Tabel manajemen produk & CRUD
 │   │   └── layout.tsx         # CMS: Shell layout & navigasi admin
+│   ├── api/
+│   │   ├── auth/
+│   │   │   ├── login/route.ts # Route Handler: Login admin JWT
+│   │   │   └── me/route.ts    # Route Handler: Verifikasi token sesi
+│   │   ├── bookings/
+│   │   │   ├── [id]/
+│   │   │   │   ├── status/route.ts # Route Handler: PATCH status reservasi
+│   │   │   │   └── route.ts        # Route Handler: Detail booking
+│   │   │   └── route.ts       # Route Handler: GET (protected) & POST (strict validation)
+│   │   └── products/
+│   │       ├── [id]/route.ts  # Route Handler: PUT & DELETE produk
+│   │       └── route.ts       # Route Handler: GET & POST katalog produk
 │   ├── booking/
 │   │   └── page.tsx           # Halaman reservasi meja (pelanggan)
 │   ├── menu/
-│   │   └── page.tsx           # Halaman katalog menu & filter kategori
+│   │   └── page.tsx           # Halaman katalog menu (DB-backed + loading/error states)
 │   ├── globals.css            # Tailwind directives & tema warna
 │   ├── layout.tsx             # Root layout dengan Navbar & Footer
 │   ├── not-found.tsx          # Custom 404 page
@@ -77,20 +98,15 @@ kopi-kita/
 │   ├── highlights.tsx         # Fitur keunggulan & menu terpopuler
 │   └── navbar.tsx             # Navbar sticky & menu mobile
 ├── lib/
-│   ├── admin-auth.ts          # Helper otentikasi admin CMS
-│   └── menu-data.ts           # Fallback catalog data store
-├── server/
+│   ├── admin-auth.ts          # Helper otentikasi admin CMS (relative path /api)
+│   ├── auth-server.ts         # Server-side JWT verification helper
+│   ├── db.ts                  # PostgreSQL connection pool singleton
+│   └── menu-data.ts           # Fallback initial catalog definitions
+├── server/                    # Legacy Express engine (Module 3 refactored into Next.js)
 │   ├── db/
-│   │   ├── index.ts           # Pool koneksi PostgreSQL
 │   │   ├── migrate.ts         # Skrip migrasi skema tabel
 │   │   └── seed.ts            # Skrip seeder admin, produk, & booking
-│   ├── middleware/
-│   │   └── auth.ts            # Security fence middleware JWT (401 Unauthorized)
-│   ├── routes/
-│   │   ├── auth.ts            # Endpoint otentikasi admin
-│   │   ├── bookings.ts        # Endpoint reservasi & ubah status
-│   │   └── products.ts        # Endpoint katalog & CRUD produk
-│   └── index.ts               # Express server (Port 4000)
+│   └── index.ts               # Express server legacy (port 4000)
 ├── docker-compose.yml         # Konfigurasi container PostgreSQL & persistent volume
 ├── .env.example               # Template environment variables (aman)
 ├── package.json
@@ -120,15 +136,12 @@ kopi-kita/
    npm run db:migrate
    npm run db:seed
    ```
-6. Jalankan Backend Express API (port 4000):
-   ```bash
-   npm run server:dev
-   ```
-7. Di terminal terpisah, jalankan Frontend & CMS Next.js (port 3000):
+6. Jalankan Server Tunggal (Next.js App Router - port 3000):
    ```bash
    npm run dev
    ```
-8. Buka di browser:
+   *Catatan: Tidak perlu menjalankan server Express terpisah (port 4000). Seluruh API terintegrasi langsung dalam Next.js.*
+7. Buka di browser:
    - Toko Pelanggan: [http://localhost:3000](http://localhost:3000)
    - Menu: [http://localhost:3000/menu](http://localhost:3000/menu)
    - Booking: [http://localhost:3000/booking](http://localhost:3000/booking)

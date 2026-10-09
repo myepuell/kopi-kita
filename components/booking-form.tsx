@@ -41,6 +41,7 @@ export default function BookingForm() {
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof BookingData, string>>>({});
+  const [serverError, setServerError] = useState<string | null>(null);
   const [submittedData, setSubmittedData] = useState<BookingData | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -95,19 +96,45 @@ export default function BookingForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
 
     setIsSubmitting(true);
-    setTimeout(() => {
+    setServerError(null);
+
+    try {
+      // Relative path on same origin as required by Module 4 integration
+      const res = await fetch("/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          full_name: formData.fullName,
+          whatsapp: formData.whatsapp,
+          booking_date: formData.date,
+          booking_time: formData.time,
+          party_size: formData.partySize,
+          notes: formData.notes,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Gagal mengirimkan reservasi.");
+      }
+
       setSubmittedData({ ...formData });
+    } catch (err: any) {
+      console.error("Booking submission error:", err);
+      setServerError(err.message || "Terjadi kendala saat mengirimkan reservasi.");
+    } finally {
       setIsSubmitting(false);
-    }, 400);
+    }
   };
 
   const handleReset = () => {
     setSubmittedData(null);
+    setServerError(null);
     setFormData({
       fullName: "",
       whatsapp: "",
@@ -195,6 +222,16 @@ export default function BookingForm() {
               Isi data di bawah ini. Kami tidak mengenakan biaya reservasi maupun deposit.
             </p>
           </div>
+
+          {serverError && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-3 text-sm text-red-700">
+              <AlertCircle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold">Gagal Menyimpan Reservasi</p>
+                <p className="text-xs text-red-600 mt-0.5">{serverError}</p>
+              </div>
+            </div>
+          )}
 
           <div className="space-y-6">
             {/* Full Name */}
