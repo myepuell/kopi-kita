@@ -139,10 +139,11 @@ export async function POST(req: NextRequest) {
     );
 
     return NextResponse.json(result.rows[0], { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating booking:', error);
+    const errorMessage = error?.message ? `Failed to submit reservation: ${error.message}` : 'Failed to submit reservation';
     return NextResponse.json(
-      { error: 'Failed to submit reservation' },
+      { error: errorMessage },
       { status: 500 }
     );
   }
