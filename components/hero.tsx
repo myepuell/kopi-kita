@@ -1,7 +1,24 @@
+"use client";
+
 import Link from "next/link";
 import { Coffee, ArrowRight, Sparkles, MapPin } from "lucide-react";
+import { useFeatureFlagVariantKey } from "posthog-js/react";
+import posthog from "posthog-js";
 
 export default function Hero() {
+  const ctaVariant = useFeatureFlagVariantKey("cta-landing");
+
+  // Fallback to control text if flag is not yet loaded or disabled
+  const ctaText = ctaVariant === "variant_a" ? "Pesan Meja Sekarang" : "Reservasi Meja";
+
+  const handleCtaClick = () => {
+    posthog.capture("cta_clicked", {
+      location: "hero",
+      variant: ctaVariant || "control",
+      target_url: "/booking",
+    });
+  };
+
   return (
     <section className="relative overflow-hidden border-b border-espresso/10 bg-gradient-to-b from-cream via-cream to-cream-dark/40 py-16 sm:py-24">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -24,9 +41,10 @@ export default function Hero() {
             <div className="flex flex-wrap items-center gap-4 pt-2">
               <Link
                 href="/booking"
+                onClick={handleCtaClick}
                 className="inline-flex items-center gap-2 rounded-full bg-espresso px-6 py-3.5 text-sm font-semibold text-cream shadow-md transition hover:bg-espresso-light"
               >
-                <span>Reservasi Meja</span>
+                <span>{ctaText}</span>
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link

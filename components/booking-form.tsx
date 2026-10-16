@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useId, type FormEvent } from "react";
+import { useState, useId, useRef, type FormEvent } from "react";
 import { Calendar, Clock, Users, Phone, User, CheckCircle2, AlertCircle, MessageSquare, ArrowRight, RefreshCw } from "lucide-react";
+import posthog from "posthog-js";
 
 interface BookingData {
   fullName: string;
@@ -44,6 +45,17 @@ export default function BookingForm() {
   const [serverError, setServerError] = useState<string | null>(null);
   const [submittedData, setSubmittedData] = useState<BookingData | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const hasTrackedStart = useRef(false);
+
+  const trackBookingStarted = () => {
+    if (!hasTrackedStart.current) {
+      hasTrackedStart.current = true;
+      posthog.capture("booking_started", {
+        source: "booking_page",
+        default_party_size: formData.partySize,
+      });
+    }
+  };
 
   // Helper untuk mendapatkan tanggal hari ini dalam format YYYY-MM-DD
   const getTodayString = () => {
@@ -122,6 +134,13 @@ export default function BookingForm() {
       if (!res.ok) {
         throw new Error(data.error || "Gagal mengirimkan reservasi.");
       }
+
+      // Track booking_submitted strictly after successful API response without PII (no name, whatsapp, email)
+      posthog.capture("booking_submitted", {
+        party_size: formData.partySize,
+        time_slot: formData.time,
+        has_notes: Boolean(formData.notes && formData.notes.trim().length > 0),
+      });
 
       setSubmittedData({ ...formData });
     } catch (err: any) {
@@ -208,6 +227,7 @@ export default function BookingForm() {
         /* Reservation Form */
         <form
           onSubmit={handleSubmit}
+          onFocus={trackBookingStarted}
           noValidate
           className="rounded-3xl border border-espresso/10 bg-white p-6 sm:p-10 shadow-lg"
         >

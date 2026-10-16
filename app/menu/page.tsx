@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { CATEGORIES, formatRupiah, type MenuCategory, type MenuItem } from "@/lib/menu-data";
 import { Coffee, Sparkles, X, CheckCircle2, AlertCircle, RefreshCw, Loader2 } from "lucide-react";
+import posthog from "posthog-js";
 
 export default function MenuPage() {
   const [products, setProducts] = useState<MenuItem[]>([]);
@@ -22,6 +23,10 @@ export default function MenuPage() {
       }
       const data: MenuItem[] = await res.json();
       setProducts(data);
+      posthog.capture("menu_viewed", {
+        category: "All",
+        items_count: data.length,
+      });
     } catch (err: any) {
       console.error("Error fetching menu:", err);
       setError(err.message || "Gagal menghubungi server menu Kopi Kita. Silakan periksa koneksi Anda.");
@@ -29,6 +34,15 @@ export default function MenuPage() {
       setLoading(false);
     }
   }, []);
+
+  const handleSelectCategory = (category: MenuCategory) => {
+    setSelectedCategory(category);
+    const count = category === "All" ? products.length : products.filter((i) => i.category === category).length;
+    posthog.capture("menu_viewed", {
+      category,
+      items_count: count,
+    });
+  };
 
   useEffect(() => {
     fetchMenu();
@@ -60,7 +74,7 @@ export default function MenuPage() {
               <button
                 key={category}
                 type="button"
-                onClick={() => setSelectedCategory(category)}
+                onClick={() => handleSelectCategory(category)}
                 className={`rounded-full px-5 py-2.5 text-sm font-semibold transition-all shadow-sm ${
                   isActive
                     ? "bg-espresso text-cream shadow-md scale-105"

@@ -13,6 +13,10 @@ yarn-error.log*
 .env.*
 !.env.example
 
+# Submission artifacts
+SUBMISSION_IMAGES/
+SUBMISSION_MODULE_3/
+
 .vercel
 *.tsbuildinfo
 next-env.d.ts

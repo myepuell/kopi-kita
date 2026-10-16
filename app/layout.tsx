@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
+import { PostHogProvider } from "@/components/posthog-provider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -23,9 +24,11 @@ export default function RootLayout({
   return (
     <html lang="id">
       <body className="flex min-h-screen flex-col bg-cream text-espresso antialiased">
-        <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <PostHogProvider>
+          <Navbar />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </PostHogProvider>
       </body>
     </html>
   );
