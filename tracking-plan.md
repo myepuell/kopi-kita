@@ -4,21 +4,21 @@
 
 - **Primary Metric:** Booking Funnel Completion Rate (`menu_viewed -> booking_started -> booking_submitted`)
 - **Target:** 30.0% completion rate from `menu_viewed` to `booking_submitted`
-- **Current Metric Status:** Target reached (Measured at 35.7% completion rate in PostHog analytics)
-- **PostHog Insight Link:** https://us.posthog.com/project/insights
+- **Current Metric Status:** BELUM DIUKUR. Isi setelah funnel punya data dari minimal 5 orang: "Tercapai/Belum tercapai, X% (n = … orang, periode …)".
+- **PostHog Insight Link:** BELUM ADA. Tempel link insight funnel yang sebenarnya (bentuknya `https://us.posthog.com/project/<id>/insights/<kode>`).
 
 ---
 
 ## Event Tracking Plan
 
-All client events use strict `object_action` format. No Personally Identifiable Information (PII) such as customer name, WhatsApp number, or email is captured.
+All client events use strict `object_action` format. No Personally Identifiable Information (PII) such as customer name, WhatsApp number, or email is captured. Di session replay, semua input disamarkan (`maskAllInputs`), dan nama, nomor WA, serta catatan di kartu konfirmasi juga disamarkan (class `ph-mask`).
 
 | Event Name | Trigger | Properties | Question It Answers |
 |---|---|---|---|
 | `cta_clicked` | Pengunjung mengklik tombol CTA utama di Hero Section | `location` (string: "hero"), `variant` (string: "control" / "variant_a"), `target_url` (string: "/booking") | Varian teks tombol mana yang menghasilkan click-through rate (CTR) tertinggi menuju formulir reservasi? |
 | `menu_viewed` | Pengunjung membuka halaman katalog menu atau memilih tab kategori menu | `category` (string: "All", "Coffee", dll.), `items_count` (number) | Berapa banyak calon pelanggan yang menjelajahi varian menu kopi & pastry sebelum memutuskan untuk melakukan reservasi? |
-| `booking_started` | Pengunjung mulai berinteraksi (fokus/input) pada formulir reservasi meja | `source` (string: "booking_page"), `default_party_size` (number) | Berapa persentase pengunjung yang menunjukkan intensi nyata memesan meja setelah tiba di halaman reservasi? |
-| `booking_submitted` | Ditembakkan **HANYA** setelah API backend (`/api/bookings`) merespons dengan status sukses (200 OK) | `party_size` (number: 1-8), `time_slot` (string: jam kunjungan), `has_notes` (boolean) | Berapa tingkat keberhasilan reservasi (*booking conversion*) dan kapasitas meja mana yang paling diminati pelanggan? |
+| `booking_started` | Pengunjung pertama kali fokus ke salah satu isian formulir reservasi (sekali per kunjungan halaman) | `source` (string: "booking_page"), `default_party_size` (number) | Berapa persentase pengunjung yang menunjukkan intensi nyata memesan meja setelah tiba di halaman reservasi? |
+| `booking_submitted` | Ditembakkan **HANYA** setelah API backend (`/api/bookings`) merespons sukses (`201 Created`, dicek lewat `res.ok`), bukan saat tombol diklik | `party_size` (number: 1-8), `time_slot` (string: jam kunjungan), `has_notes` (boolean) | Berapa tingkat keberhasilan reservasi (*booking conversion*) dan kapasitas meja mana yang paling diminati pelanggan? |
 
 ---
 
@@ -29,25 +29,32 @@ All client events use strict `object_action` format. No Personally Identifiable 
 - **Variants:**
   - `control`: Teks tombol `"Reservasi Meja"`.
   - `variant_a`: Teks tombol `"Pesan Meja Sekarang"`.
-- **Targeting:** 50% split traffic untuk A/B testing konversi CTA landing page.
+- **Targeting (diatur di PostHog):** 50% `control`, 50% `variant_a`. Key varian di PostHog harus persis `control` dan `variant_a`, karena kode hanya mengenali `variant_a`; nilai lain jatuh ke teks bawaan.
 
 ---
 
 ## Week 2 Findings
 
-Hasil observasi dari Session Replay PostHog (berdasarkan sesi rekaman navigasi dan percobaan reservasi pengunjung):
+BELUM ADA DATA. Isi dari rekaman session replay yang benar-benar ada: sesi yang gagal booking atau sesi terpanjang. Tulis hanya yang terlihat di rekaman, dan salin link rekamannya dari PostHog (Replay → buka rekaman → Share/Copy link).
 
-1. **Drop-off pada pemilihan jam malam (20:00 - 21:00 WIB)**
-   - *Observasi:* Pengunjung yang datang pada jam malam cenderung ragu memilih slot jam 21:00 karena khawatir kedai kopi segera tutup sebelum durasi 2 jam selesai.
-   - *Rekomendasi:* Tambahkan label penjelasan bahwa slot 21:00 tetap mendapatkan pelayanan penuh hingga 23:00 WIB.
-   - *Recording Link:* https://us.posthog.com/project/session-recordings/rec_week2_dropoff_timeslot
+1. **(judul temuan)**
+   - *Yang terlihat di rekaman:* …
+   - *Dampak / dugaan penyebab:* …
+   - *Rekomendasi:* …
+   - *Recording Link:* …
 
-2. **Pengunjung memeriksa daftar menu sebelum mengklik CTA Reservasi**
-   - *Observasi:* Lebih dari 60% pengunjung mengunjungi halaman `/menu` terlebih dahulu untuk melihat kisaran harga dan menu favorit sebelum beralih ke form `/booking`.
-   - *Rekomendasi:* Tambahkan tombol CTA cepat "Pesan Meja untuk Menu Ini" langsung di halaman detail modal menu.
-   - *Recording Link:* https://us.posthog.com/project/session-recordings/rec_week2_menu_to_booking
+2. **(judul temuan)**
+   - *Yang terlihat di rekaman:* …
+   - *Dampak / dugaan penyebab:* …
+   - *Rekomendasi:* …
+   - *Recording Link:* …
 
-3. **Input nomor WhatsApp awalnya diisi dengan karakter strip/simbol oleh sebagian pengguna**
-   - *Observasi:* Di formulir, pengguna mengetik format seperti `0812-3456-7890`. Validasi form mendeteksi karakter non-angka dan menampilkan pesan error peringatan.
-   - *Rekomendasi:* Buat sistem input otomatis membersihkan karakter strip/spasi secara langsung (auto-sanitized) agar tidak memicu error yang membingungkan.
-   - *Recording Link:* https://us.posthog.com/project/session-recordings/rec_week2_whatsapp_input_behavior
+3. **(judul temuan)**
+   - *Yang terlihat di rekaman:* …
+   - *Dampak / dugaan penyebab:* …
+   - *Rekomendasi:* …
+   - *Recording Link:* …
+
+### Hipotesis untuk dicek di rekaman (bukan temuan)
+
+- Formulir dan server sama-sama menolak nomor WhatsApp yang berisi strip atau spasi (regex `^\d+$` di `components/booking-form.tsx` dan `app/api/bookings/route.ts`), padahal format seperti `0812-3456-7890` umum dipakai. Cek apakah ada rekaman pengunjung yang tertahan di pesan error ini.

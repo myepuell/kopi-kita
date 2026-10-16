@@ -178,11 +178,12 @@ export default function BookingForm() {
             Permintaan Reservasi Diterima
           </span>
           <h2 className="mt-1 font-serif text-3xl font-extrabold text-espresso">
-            Sampai Jumpa, {submittedData.fullName}!
+            {/* ph-mask: nama, nomor WA, dan catatan disamarkan di session replay PostHog */}
+            Sampai Jumpa, <span className="ph-mask">{submittedData.fullName}</span>!
           </h2>
           <p className="mt-2 text-sm text-espresso/70 leading-relaxed">
             Meja Anda telah kami catat. Tim Kopi Kita akan mengirimkan konfirmasi via WhatsApp ke{" "}
-            <strong className="text-espresso">{submittedData.whatsapp}</strong>.
+            <strong className="ph-mask text-espresso">{submittedData.whatsapp}</strong>.
           </p>
 
           {/* Ticket Style Summary */}
@@ -207,7 +208,8 @@ export default function BookingForm() {
 
             {submittedData.notes && (
               <div className="mt-4 border-t border-espresso/10 pt-4 text-xs text-espresso/75">
-                <span className="font-semibold text-espresso">Catatan:</span> {submittedData.notes}
+                <span className="font-semibold text-espresso">Catatan:</span>{" "}
+                <span className="ph-mask">{submittedData.notes}</span>
               </div>
             )}
           </div>
