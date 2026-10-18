@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_kopi_kita_jwt_key_2026';
+import { getJwtSecret } from '../../lib/jwt-secret';
 
 export interface AuthRequest extends Request {
   user?: {
@@ -28,8 +27,14 @@ export function requireAuth(req: AuthRequest, res: Response, next: NextFunction)
     return;
   }
 
+  const secret = getJwtSecret();
+  if (!secret) {
+    res.status(503).json({ error: 'Login admin belum dikonfigurasi di server.' });
+    return;
+  }
+
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { id: number; email: string; name: string };
+    const decoded = jwt.verify(token, secret, { algorithms: ['HS256'] }) as { id: number; email: string; name: string };
     req.user = decoded;
     next();
   } catch (err) {

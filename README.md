@@ -145,7 +145,7 @@ kopi-kita/
    - Toko Pelanggan: [http://localhost:3000](http://localhost:3000)
    - Menu: [http://localhost:3000/menu](http://localhost:3000/menu)
    - Booking: [http://localhost:3000/booking](http://localhost:3000/booking)
-   - CMS Admin: [http://localhost:3000/admin/products](http://localhost:3000/admin/products) (Login: `admin@kopikita.id` / `admin123`)
+   - CMS Admin: [http://localhost:3000/admin/products](http://localhost:3000/admin/products) (Login lokal hasil seed: `admin@kopikita.id` / `admin123`, hanya untuk database Docker lokal; database cloud memakai `ADMIN_SEED_PASSWORD`, dan `JWT_SECRET` wajib diisi di `.env`)
 
 ## Build Produksi
 

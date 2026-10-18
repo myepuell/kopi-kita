@@ -3,12 +3,18 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { pool } from '../db';
 import { requireAuth, AuthRequest } from '../middleware/auth';
+import { getJwtSecret } from '../../lib/jwt-secret';
 
 const router = Router();
-const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_kopi_kita_jwt_key_2026';
 
 // POST /api/auth/login
 router.post('/login', async (req: Request, res: Response) => {
+  const jwtSecret = getJwtSecret();
+  if (!jwtSecret) {
+    res.status(503).json({ error: 'Login admin belum dikonfigurasi di server.' });
+    return;
+  }
+
   try {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -31,8 +37,8 @@ router.post('/login', async (req: Request, res: Response) => {
 
     const token = jwt.sign(
       { id: user.id, email: user.email, name: user.name },
-      JWT_SECRET,
-      { expiresIn: '7d' }
+      jwtSecret,
+      { expiresIn: '7d', algorithm: 'HS256' }
     );
 
     res.json({
