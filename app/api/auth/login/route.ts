@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { query } from '@/lib/db';
 import { getJwtSecret } from '@/lib/jwt-secret';
 import { ADMIN_COOKIE, ADMIN_SESSION_SECONDS, adminCookieOptions } from '@/lib/admin-cookie';
+import { clearFailedLogins, clientIp, loginRetryAfterSeconds, recordFailedLogin } from '@/lib/login-rate-limit';
 
 export async function POST(req: NextRequest) {
   const jwtSecret = getJwtSecret();
@@ -15,6 +16,16 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    // Dicek sebelum query user dan bcrypt: setelah 5 kali gagal, password benar pun ditolak sampai jeda selesai.
+    const ip = clientIp(req);
+    const retryAfter = await loginRetryAfterSeconds(ip);
+    if (retryAfter > 0) {
+      return NextResponse.json(
+        { error: `Terlalu banyak percobaan login. Coba lagi dalam ${Math.ceil(retryAfter / 60)} menit.` },
+        { status: 429, headers: { 'Retry-After': String(retryAfter) } }
+      );
+    }
+
     const body = await req.json();
     const { email, password } = body;
 
@@ -27,6 +38,7 @@ export async function POST(req: NextRequest) {
 
     const result = await query('SELECT * FROM admin_users WHERE email = $1', [email]);
     if (result.rows.length === 0) {
+      await recordFailedLogin(ip);
       return NextResponse.json(
         { error: 'Invalid email or password' },
         { status: 401 }
@@ -36,11 +48,14 @@ export async function POST(req: NextRequest) {
     const user = result.rows[0];
     const isMatch = await bcrypt.compare(password, user.password_hash);
     if (!isMatch) {
+      await recordFailedLogin(ip);
       return NextResponse.json(
         { error: 'Invalid email or password' },
         { status: 401 }
       );
     }
+
+    await clearFailedLogins(ip);
 
     const token = jwt.sign(
       { id: user.id, email: user.email, name: user.name },
