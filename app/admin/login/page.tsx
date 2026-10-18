@@ -8,8 +8,9 @@ import { API_BASE, setAuthSession } from "@/lib/admin-auth";
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("admin@kopikita.id");
-  const [password, setPassword] = useState("admin123");
+  // Sengaja kosong: dulu terisi email & password bawaan, sehingga password admin terlihat siapa pun yang membuka halaman ini.
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
