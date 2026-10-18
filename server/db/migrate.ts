@@ -1,4 +1,5 @@
 import { pool } from './index';
+import { LOGIN_FAILURES_DDL } from '../../lib/login-failures-schema';
 
 export async function migrate() {
   const client = await pool.connect();
@@ -48,6 +49,10 @@ export async function migrate() {
       );
     `);
     console.log('✓ bookings table ready');
+
+    // Juga dibuat otomatis oleh lib/login-rate-limit.ts saat login pertama.
+    await client.query(LOGIN_FAILURES_DDL);
+    console.log('✓ login_failures table ready');
 
     console.log('All migrations completed successfully.');
   } finally {
