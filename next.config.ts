@@ -15,6 +15,12 @@ const nextConfig: NextConfig = {
           { key: "X-Frame-Options", value: "DENY" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()" },
+          // Isolasi lintas-origin (Spectre): jendela lain tidak bisa memegang referensi ke halaman ini,
+          // dan sumber daya kita tidak bisa disematkan situs lain. COEP "credentialless" (bukan
+          // "require-corp") karena skrip PostHog dari us-assets.i.posthog.com tidak mengirim header CORP.
+          { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+          { key: "Cross-Origin-Embedder-Policy", value: "credentialless" },
+          { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
         ],
       },
     ];
