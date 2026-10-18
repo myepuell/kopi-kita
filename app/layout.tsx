@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { PostHogProvider } from "@/components/posthog-provider";
@@ -17,11 +18,15 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Membaca header membuat semua halaman dirender per request, sehingga Next.js bisa memasang
+  // nonce CSP dari middleware.ts ke skripnya. Halaman statis tidak punya nonce dan akan diblokir CSP.
+  await headers();
+
   return (
     <html lang="id">
       <body className="flex min-h-screen flex-col bg-cream text-espresso antialiased">

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Plus, Search, Edit2, Trash2, CheckCircle2, XCircle, AlertCircle, RefreshCw, Star, Tag } from "lucide-react";
-import { API_BASE, getAuthToken } from "@/lib/admin-auth";
+import { API_BASE } from "@/lib/admin-auth";
 import { formatRupiah } from "@/lib/menu-data";
 
 interface Product {
@@ -88,14 +88,12 @@ export default function AdminProductsPage() {
   };
 
   const handleToggleAvailable = async (p: Product) => {
-    const token = getAuthToken();
     try {
       const nextAvailable = !p.available;
       const res = await fetch(`${API_BASE}/api/products/${p.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ available: nextAvailable }),
       });
@@ -113,13 +111,9 @@ export default function AdminProductsPage() {
 
   const handleDelete = async (id: string, name: string) => {
     if (!confirm(`Hapus produk "${name}" dari database?`)) return;
-    const token = getAuthToken();
     try {
       const res = await fetch(`${API_BASE}/api/products/${id}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
 
       if (!res.ok) throw new Error("Gagal menghapus produk");
@@ -134,7 +128,6 @@ export default function AdminProductsPage() {
   const handleSubmitForm = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    const token = getAuthToken();
 
     try {
       const payload = {
@@ -152,7 +145,6 @@ export default function AdminProductsPage() {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(payload),
         });
@@ -163,7 +155,6 @@ export default function AdminProductsPage() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(payload),
         });

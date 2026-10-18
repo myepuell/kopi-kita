@@ -15,7 +15,7 @@ import {
   FileText,
   AlertCircle,
 } from "lucide-react";
-import { API_BASE, getAuthToken } from "@/lib/admin-auth";
+import { API_BASE } from "@/lib/admin-auth";
 
 interface Booking {
   id: number;
@@ -43,20 +43,9 @@ export default function AdminBookingsPage() {
   const fetchBookings = async () => {
     setLoading(true);
     setError(null);
-    const token = getAuthToken();
-
-    if (!token) {
-      setError("Token otentikasi tidak ditemukan. Silakan login terlebih dahulu.");
-      setLoading(false);
-      return;
-    }
 
     try {
-      const res = await fetch(`${API_BASE}/api/bookings`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await fetch(`${API_BASE}/api/bookings`);
 
       if (!res.ok) {
         if (res.status === 401) {
@@ -85,13 +74,11 @@ export default function AdminBookingsPage() {
 
   const handleStatusChange = async (id: number, newStatus: string) => {
     setUpdatingId(id);
-    const token = getAuthToken();
     try {
       const res = await fetch(`${API_BASE}/api/bookings/${id}/status`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ status: newStatus }),
       });
