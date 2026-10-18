@@ -18,7 +18,7 @@ Pernyataan ini menetapkan aset yang **boleh** dan **tidak boleh** saya uji selam
 
 | Aset | Batasan |
 |---|---|
-| Production `https://kopi-kita-eight.vercel.app` | Hanya pemakaian normal dan monitoring pasif (uptime check ke `/api/health`). Tidak ada scanner, fuzzing, brute force login, load test, atau token palsu |
+| Production `https://kopi-kita-eight.vercel.app` | Hanya pemakaian normal, monitoring pasif (uptime check ke `/api/health`), cek header pasif halaman publik (securityheaders.com atau `curl -I`), dan login admin milik sendiri. Tidak ada scanner, fuzzing, brute force login, load test, atau token palsu |
 | Database Neon production | Tidak ada query uji. Hanya operasi pemilik (mis. mengganti password admin) |
 | Vercel preview deployment | Hanya cek fungsi (bug latihan Sentry). Tidak di-scan, karena bisa memakai database yang sama dengan production |
 | Layanan pihak ketiga: Vercel, Neon, GitHub, npm registry, PostHog, Sentry, UptimeRobot | Hanya mengatur akun sendiri. Platformnya tidak diuji |
