@@ -4,10 +4,12 @@ const globalForPg = globalThis as unknown as { pgPool?: Pool };
 
 function createPool(): Pool {
   if (process.env.DATABASE_URL) {
+    // Sertifikat database (Neon) wajib diverifikasi supaya koneksi tidak bisa disadap/dibelokkan (MITM).
+    // Catatan: parameter sslmode di DATABASE_URL menimpa opsi ini; pakai sslmode=verify-full.
     return new Pool({
       connectionString: process.env.DATABASE_URL,
       ssl: {
-        rejectUnauthorized: false,
+        rejectUnauthorized: true,
       },
     });
   }
