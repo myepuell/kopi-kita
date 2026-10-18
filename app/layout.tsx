@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { PostHogProvider } from "@/components/posthog-provider";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -29,6 +30,7 @@ export default function RootLayout({
           <main className="flex-1">{children}</main>
           <Footer />
         </PostHogProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
