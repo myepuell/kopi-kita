@@ -1,0 +1,4 @@
+# Aturan ZAP baseline (format: id<TAB>IGNORE|INFO|WARN|FAIL<TAB>alasan).
+# Setiap IGNORE wajib punya alasan tertulis di SECURITY-REPORT.md (Accepted Risks).
+10049	IGNORE	Non-Storable Content: halaman HTML sengaja dirender per request dengan nonce CSP baru, jadi memang tidak boleh di-cache (SECURITY-REPORT.md, Accepted Risks A-2).
+10055	IGNORE	CSP style-src unsafe-inline: atribut style dari React/motion tidak bisa diberi nonce; script-src tetap ber-nonce + strict-dynamic (temuan F13, SECURITY-REPORT.md Accepted Risks A-1).
