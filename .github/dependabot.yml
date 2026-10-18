@@ -10,6 +10,9 @@ updates:
       time: "08:00"
       timezone: "Asia/Jakarta"
     open-pull-requests-limit: 5
+    # Tunggu 7 hari setelah versi baru rilis: paket berbahaya yang baru diunggah biasanya ketahuan dan ditarik dalam beberapa hari.
+    cooldown:
+      default-days: 7
     commit-message:
       prefix: "deps"
     groups:
