@@ -31,7 +31,7 @@ export default function AdminLoginPage() {
         throw new Error(data.error || "Login gagal, silakan periksa kredensial Anda.");
       }
 
-      setAuthSession(data.token, data.user);
+      setAuthSession(data.user);
       router.push("/admin/products");
     } catch (err: any) {
       setError(err.message || "Gagal terhubung ke backend API (Port 4000).");
