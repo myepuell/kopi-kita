@@ -98,12 +98,6 @@ export default function AdminLoginPage() {
             </div>
           </div>
 
-          <div className="bg-stone-950/60 border border-stone-800/80 rounded-lg p-3 text-[11px] text-stone-400">
-            <div className="font-semibold text-amber-400/90 mb-0.5">Kredensial Default Seed:</div>
-            <div>Email: <code className="text-stone-300 font-mono">admin@kopikita.id</code></div>
-            <div>Password: <code className="text-stone-300 font-mono">admin123</code></div>
-          </div>
-
           <button
             type="submit"
             disabled={loading}
