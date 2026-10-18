@@ -7,14 +7,14 @@ export interface AdminUser {
 // Relative paths on the same origin as required by Module 4 integration
 export const API_BASE = '';
 
-export function getAuthToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('admin_token');
-}
+// Sesi admin = cookie HttpOnly `admin_token` yang dipasang server saat login dan ikut terkirim otomatis
+// ke /api/* (same-origin). JavaScript tidak memegang token; localStorage hanya menyimpan nama/email untuk tampilan.
+const USER_KEY = 'admin_user';
+const LEGACY_TOKEN_KEY = 'admin_token'; // versi lama menyimpan token di localStorage
 
 export function getAuthUser(): AdminUser | null {
   if (typeof window === 'undefined') return null;
-  const raw = localStorage.getItem('admin_user');
+  const raw = localStorage.getItem(USER_KEY);
   if (!raw) return null;
   try {
     return JSON.parse(raw);
@@ -23,16 +23,15 @@ export function getAuthUser(): AdminUser | null {
   }
 }
 
-export function setAuthSession(token: string, user: AdminUser): void {
+export function setAuthSession(user: AdminUser): void {
   if (typeof window === 'undefined') return;
-  localStorage.setItem('admin_token', token);
-  localStorage.setItem('admin_user', JSON.stringify(user));
-  document.cookie = `admin_token=${token}; path=/; max-age=604800; SameSite=Lax`;
+  localStorage.removeItem(LEGACY_TOKEN_KEY);
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
 }
 
-export function clearAuthSession(): void {
+export async function logout(): Promise<void> {
   if (typeof window === 'undefined') return;
-  localStorage.removeItem('admin_token');
-  localStorage.removeItem('admin_user');
-  document.cookie = 'admin_token=; path=/; max-age=0';
+  localStorage.removeItem(LEGACY_TOKEN_KEY);
+  localStorage.removeItem(USER_KEY);
+  await fetch(`${API_BASE}/api/auth/logout`, { method: 'POST' }).catch(() => undefined);
 }

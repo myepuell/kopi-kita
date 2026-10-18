@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Coffee, CalendarCheck, LogOut, ExternalLink, ShieldCheck } from "lucide-react";
-import { getAuthToken, getAuthUser, clearAuthSession, AdminUser } from "@/lib/admin-auth";
+import { API_BASE, getAuthUser, logout, AdminUser } from "@/lib/admin-auth";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -14,17 +14,30 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     setMounted(true);
-    const token = getAuthToken();
-    const currentUser = getAuthUser();
-    if (!token && pathname !== "/admin/login") {
-      router.push("/admin/login");
-    } else {
-      setUser(currentUser);
-    }
+    if (pathname === "/admin/login") return;
+    setUser(getAuthUser());
+    // Sesi ada di cookie HttpOnly yang tidak terbaca JavaScript, jadi tanyakan ke server.
+    let cancelled = false;
+    fetch(`${API_BASE}/api/auth/me`)
+      .then(async (res) => {
+        if (cancelled) return;
+        if (!res.ok) {
+          router.push("/admin/login");
+          return;
+        }
+        const data = await res.json();
+        setUser(data.user);
+      })
+      .catch(() => {
+        if (!cancelled) router.push("/admin/login");
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [pathname, router]);
 
-  const handleLogout = () => {
-    clearAuthSession();
+  const handleLogout = async () => {
+    await logout();
     router.push("/admin/login");
   };
 
