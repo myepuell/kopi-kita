@@ -1,0 +1,2 @@
+# Aturan ZAP baseline (format: id<TAB>IGNORE|INFO|WARN|FAIL<TAB>alasan).
+# Setiap IGNORE wajib punya alasan tertulis di SECURITY-REPORT.md (Accepted Risks).
