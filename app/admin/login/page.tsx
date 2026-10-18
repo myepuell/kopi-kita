@@ -8,8 +8,9 @@ import { API_BASE, setAuthSession } from "@/lib/admin-auth";
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("admin@kopikita.id");
-  const [password, setPassword] = useState("admin123");
+  // Sengaja kosong: dulu terisi email & password bawaan, sehingga password admin terlihat siapa pun yang membuka halaman ini.
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -95,12 +96,6 @@ export default function AdminLoginPage() {
                 className="w-full bg-stone-950 border border-stone-800 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 rounded-xl pl-10 pr-4 py-2.5 text-sm text-stone-100 placeholder-stone-600 outline-none transition"
               />
             </div>
-          </div>
-
-          <div className="bg-stone-950/60 border border-stone-800/80 rounded-lg p-3 text-[11px] text-stone-400">
-            <div className="font-semibold text-amber-400/90 mb-0.5">Kredensial Default Seed:</div>
-            <div>Email: <code className="text-stone-300 font-mono">admin@kopikita.id</code></div>
-            <div>Password: <code className="text-stone-300 font-mono">admin123</code></div>
           </div>
 
           <button

@@ -1,7 +1,6 @@
 import { NextRequest } from 'next/server';
 import jwt from 'jsonwebtoken';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_kopi_kita_jwt_key_2026';
+import { getJwtSecret } from '@/lib/jwt-secret';
 
 export interface AdminPayload {
   id: number;
@@ -24,8 +23,11 @@ export function getAdminUserFromRequest(req: NextRequest): AdminPayload | null {
 
   if (!token) return null;
 
+  const secret = getJwtSecret();
+  if (!secret) return null;
+
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as AdminPayload;
+    const decoded = jwt.verify(token, secret, { algorithms: ['HS256'] }) as AdminPayload;
     return decoded;
   } catch {
     return null;

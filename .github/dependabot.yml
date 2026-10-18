@@ -1,0 +1,23 @@
+# Dependabot: PR pembaruan dependensi npm setiap minggu.
+# Dependabot alerts (peringatan paket rentan) dinyalakan di Settings → Advanced Security.
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "08:00"
+      timezone: "Asia/Jakarta"
+    open-pull-requests-limit: 5
+    # Tunggu 7 hari setelah versi baru rilis: paket berbahaya yang baru diunggah biasanya ketahuan dan ditarik dalam beberapa hari.
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: "deps"
+    groups:
+      # Pembaruan minor/patch digabung satu PR supaya tidak banjir PR kecil.
+      minor-dan-patch:
+        update-types:
+          - "minor"
+          - "patch"

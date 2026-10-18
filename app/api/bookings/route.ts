@@ -140,10 +140,10 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(result.rows[0], { status: 201 });
   } catch (error: any) {
+    // Detail error (pesan database, nama tabel/kolom) hanya di log server, tidak dikirim ke pengunjung.
     console.error('Error creating booking:', error);
-    const errorMessage = error?.message ? `Failed to submit reservation: ${error.message}` : 'Failed to submit reservation';
     return NextResponse.json(
-      { error: errorMessage },
+      { error: 'Reservasi gagal dikirim karena kendala server. Silakan coba lagi beberapa saat lagi.' },
       { status: 500 }
     );
   }

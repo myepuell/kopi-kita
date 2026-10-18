@@ -8,15 +8,22 @@ export async function seed() {
     console.log('--- Seeding Database for Kopi Kita ---');
 
     // 1. Seed Admin User
+    // Password "admin123" hanya untuk database lokal (Docker). Untuk database cloud (DATABASE_URL terisi),
+    // password admin wajib dari ADMIN_SEED_PASSWORD supaya password publik di README tidak ikut ke production.
     const adminEmail = 'admin@kopikita.id';
+    const isCloudDatabase = Boolean(process.env.DATABASE_URL);
+    const adminPassword = process.env.ADMIN_SEED_PASSWORD || (isCloudDatabase ? '' : 'admin123');
+    if (adminPassword.length < 12 && isCloudDatabase) {
+      throw new Error('Database cloud: isi ADMIN_SEED_PASSWORD (minimal 12 karakter) sebelum seed.');
+    }
     const existingAdmin = await client.query('SELECT id FROM admin_users WHERE email = $1', [adminEmail]);
     if (existingAdmin.rows.length === 0) {
-      const passwordHash = await bcrypt.hash('admin123', 10);
+      const passwordHash = await bcrypt.hash(adminPassword, 10);
       await client.query(
         'INSERT INTO admin_users (email, password_hash, name) VALUES ($1, $2, $3)',
         [adminEmail, passwordHash, 'Manager Kopi Kita']
       );
-      console.log('✓ Seeded admin user: admin@kopikita.id / admin123');
+      console.log(`✓ Seeded admin user: ${adminEmail}${isCloudDatabase ? ' (password dari ADMIN_SEED_PASSWORD)' : ' / admin123 (lokal)'}`);
     } else {
       console.log('• Admin user already exists');
     }

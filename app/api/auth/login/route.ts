@@ -2,10 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { query } from '@/lib/db';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_kopi_kita_jwt_key_2026';
+import { getJwtSecret } from '@/lib/jwt-secret';
 
 export async function POST(req: NextRequest) {
+  const jwtSecret = getJwtSecret();
+  if (!jwtSecret) {
+    return NextResponse.json(
+      { error: 'Login admin belum dikonfigurasi di server.' },
+      { status: 503 }
+    );
+  }
+
   try {
     const body = await req.json();
     const { email, password } = body;
@@ -36,8 +43,8 @@ export async function POST(req: NextRequest) {
 
     const token = jwt.sign(
       { id: user.id, email: user.email, name: user.name },
-      JWT_SECRET,
-      { expiresIn: '7d' }
+      jwtSecret,
+      { expiresIn: '7d', algorithm: 'HS256' }
     );
 
     return NextResponse.json({
